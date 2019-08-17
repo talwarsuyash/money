@@ -8,7 +8,7 @@ public class ConnectionFactory {
 
     public static final String URL = "jdbc:mysql://remotemysql.com:3306/afjoA7w6GW?useLegacyDatetimeCode=false&serverTimezone=GMT%2B5";
     public static final String USER = "afjoA7w6GW";
-    public static final String PASSWORD = "5Lk80EwrBL";
+    public static final String PASSWORD = "";
     public static final String TIMEZONE = "Asia";
 
     private ConnectionFactory() {
