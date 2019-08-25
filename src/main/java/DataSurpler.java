@@ -37,22 +37,26 @@ public class DataSurpler {
                     .getElementsByTag("td");
         List<String> elementStrings = new ArrayList<>();
         elements.forEach(element -> elementStrings.add(element.text()));
-        elementStrings.removeIf(item -> item == null || "".equals(item));
+//        elementStrings.removeIf(item -> item == null || "".equals(item));
         List<Entry> entries = new ArrayList<>();
 
 
-        for(int tCount=34;tCount<elementStrings.size();tCount++){
+        for(int tCount=45;tCount<elementStrings.size();tCount+=6){
 //            System.out.println(tCount+"\t"+elementStrings.get(tCount));
 
-            String item = elementStrings.get(tCount++);
+            String item = elementStrings.get(tCount);
+            if(item.equals("Total"))
+                break;
             if(item.contains("/") && item.length()==10) {
                 String date = item;
-                String desc = elementStrings.get(tCount++);
-                String amount = elementStrings.get(tCount);
-                entries.add(new Entry(date, desc, amount));
+                String desc = elementStrings.get(tCount+1);
+                String debit = elementStrings.get(tCount+2);
+                String credit = elementStrings.get(tCount+3);
+                entries.add(new Entry(date, desc, debit,credit));;
             }
         }
                 entries.forEach(entry -> System.out.println(entry));
+//                entries.removeIf(entry -> entry.description.contains("POS TRANSACTION "));
         return  entries;
 //        int max = entries.get(0).description.length();
 //        for(Entry entry :entries){

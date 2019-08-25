@@ -10,31 +10,31 @@ public class Entry {
 
     String date;
     String description;
-    Double amount;
+    Double debit;
+    Double credit;
     int type;
     DateFormat d,d2;
 
-    public Entry(String date,String desc,String amount){
+    public Entry(String date,String desc,String debit,String credit){
 
         this.date = date;
         this.description=desc;
-        this.amount=Double.parseDouble(amount.replace(",",""));
+        this.debit=debit.isEmpty()?0.0:Double.parseDouble(debit.replace(",",""));
+        this.credit=credit.isEmpty()?0.0:Double.parseDouble(credit.replace(",",""));
         this.type=getType();
     }
 
     @Override
     public String toString() {
-        return date+"\t||\t"+description+"\t||\t"+amount+"\t||\t"+type;
+        return date+"\t||\t"+description+"\t||\t"+debit+"\t||\t"+credit+"\t||\t"+type;
     }
 
     private int getType(){
-        int  t = 1;
-        String[] credits = {"OUTWARD","CREDIT"};
-        String[] debits = {"WITHDRAWAL","PURCHASE","INWARD"};
-        if(Arrays.stream(debits).parallel().anyMatch(description::contains))
+        int  t = 5;
+        if(this.debit==0.0)
+            t=1;
+        else if (this.credit==0.0)
             t=-1;
-//        else if ((Arrays.stream(debits).parallel().anyMatch(description::contains)))
-//            t='d';
         return t;
     }
 //    private String parseDate(String date){

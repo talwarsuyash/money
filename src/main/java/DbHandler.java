@@ -9,9 +9,10 @@ public class DbHandler {
     private Statement statement = null;
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
-
     private final String db = "afjoA7w6GW";
     private final String table = "Entry";
+    private final String selectAll = "select * from " + db + "." + table;
+
     List<DbEntry> dBentries = new ArrayList<>();
 
     public DbHandler() {
@@ -55,26 +56,27 @@ public class DbHandler {
         }
     }
 
-    public void getDbEntries() {
+    public void getFromDb(String query) {
         // ResultSet is initially before the first data set
 
 
         try {
             resultSet = statement
-                    .executeQuery("select * from " + db + "." + table);
+                    .executeQuery(query);
             while (resultSet.next()) {
                 // It is possible to get the columns via name
                 // also possible to get the columns via the column number
                 // which starts at 1
                 // e.g. resultSet.getSTring(2);
                 String date = resultSet.getString("Date");
-                Double amount = resultSet.getDouble("Amount");
+                Double debit = resultSet.getDouble("Debit");
+                Double credit = resultSet.getDouble("Credit");
                 String desc = resultSet.getString("Description");
-                String type = resultSet.getString("Type");
+//                String type = resultSet.getString("Type");
                 Double balance = resultSet.getDouble("Balance");
 //                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
 //                DbEntry entry = new DbEntry(date, desc, amount, balance, timestamp);
-                DbEntry entry = new DbEntry(date, desc, amount, balance);
+                DbEntry entry = new DbEntry(date, desc, debit,credit, balance);
                 dBentries.add(entry);
 
             }
@@ -86,23 +88,24 @@ public class DbHandler {
 
     public void setEntries(List<Entry> entries) {
         if (dBentries.size() == 0)
-            getDbEntries();
+            getFromDb(selectAll);
         String query = "insert into " + db + "." + table + " values (?, ?, ?, ?,? )";
 //        String query = "insert into "+db+"."+table+" values (?, ?, ?, ? ,?,?)";
-        Entry firstEntry = entries.get(1);
+
+        System.out.println("Number for existing entries :"+ dBentries.size() );
+        Entry firstEntry = entries.get(0);
         int count = 0;
         boolean start = false;
         for (DbEntry dBentry : dBentries) {
-            if (dBentry.date.equals(firstEntry.date) && dBentry.amount.equals(firstEntry.amount)) {
+            if (dBentry.date.equals(firstEntry.date) && dBentry.debit.equals(firstEntry.debit) && dBentry.credit.equals(firstEntry.credit)) {
                 start = true;
-                count++;
             }
             if (start)
                 count++;
 
         }
 
-        System.out.println(count);
+        System.out.println("Number for Duplicate entries :"+ count);
         try {
             preparedStatement = connect
                     .prepareStatement(query);
@@ -112,15 +115,15 @@ public class DbHandler {
             Double old = getBalance();
             Double balance;
 
-                for(int i=count;i<entries.size();i++){
+            for(int i=count;i<entries.size();i++){
                 Entry entry = entries.get(i);
-                balance = old + (entry.type * entry.amount);
+                balance = old + (entry.type * (entry.type==1?entry.credit:entry.debit));
                 try{
 
                     preparedStatement.setString(1, entry.date);
                     preparedStatement.setString(2, entry.description);
-                    preparedStatement.setDouble(3, entry.type);
-                    preparedStatement.setDouble(4, entry.amount);
+                    preparedStatement.setDouble(3, entry.debit);
+                    preparedStatement.setDouble(4, entry.credit);
                     preparedStatement.setDouble(5, balance);
     //                    preparedStatement.setTimestamp(5, new Timestamp(new java.util.Date().getTime()));
                     preparedStatement.executeUpdate();
@@ -133,6 +136,8 @@ public class DbHandler {
             }catch(SQLException e){
                 e.printStackTrace();
             }
+        int entriesUpdated = entries.size()-count>0?entries.size()-count:0;
+        System.out.println("Number for entries updated :"+ entriesUpdated);
 
     }
 
