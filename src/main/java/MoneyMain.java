@@ -8,7 +8,7 @@ public class MoneyMain {
 
     public static void main(String Args[]) throws IOException {
 
-        String query = "select * from " + db + "." + table;
+
         String filePath = "C:\\Users\\Suyash Talwar\\Downloads\\";
 //        String fileName = "Savings_Stmt_040819183852.xls";
 //        String fileName = "Savings_Stmt_24081921403.XLS";
@@ -18,6 +18,7 @@ public class MoneyMain {
     }
 
     private static void update(String filePath,String fileName) throws  IOException{
+        String query = "select * from " + db + "." + table;
         List<Entry> entries = DataSurpler.readFile(filePath+fileName);
 
         DbHandler h = new DbHandler();
