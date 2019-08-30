@@ -1,12 +1,17 @@
-import java.sql.Date;
+
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.Date;
+
 
 public class DbEntry {
 
-    String date;
+    Date date;
     String description;
     Double debit;
     Double credit;
     Double balance;
+    SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
 //    Timestamp timestamp;
 
 
@@ -19,7 +24,12 @@ public class DbEntry {
 //    }
 
     public DbEntry(String date, String desc, Double debit,Double credit, Double balance){
-        this.date  = date;
+        try{
+            this.date  = f.parse(date);
+        }
+        catch (Exception e ){
+            e.printStackTrace();
+        }
         this.description=desc;
         this.debit=debit;
         this.credit=credit;
@@ -29,7 +39,7 @@ public class DbEntry {
 
     @Override
     public String toString() {
-        return date+"\t||\t"+description+"\t||\t"+debit+"\t||\t"+credit+"\t||\t"+balance;
+        return f.format(date)+"\t||\t"+description+"\t||\t"+debit+"\t||\t"+credit+"\t||\t"+balance;
     }
     public void print(){
         System.out.println("Date: " + date );
@@ -39,4 +49,10 @@ public class DbEntry {
         System.out.println("Balance : " + balance);
 //        System.out.println("Timestamp : " + timestamp);
     }
+
+        public String getEntryAsString(){
+        return  f.format(this.date);
+    }
+
+
 }

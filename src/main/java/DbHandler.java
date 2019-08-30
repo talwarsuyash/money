@@ -20,6 +20,7 @@ public class DbHandler {
             // Statements allow to issue SQL queries to the database
             connect = ConnectionFactory.getConnection();
             statement = connect.createStatement();
+            dBentries= getAllFromDb(selectAll);
             // Result set get the result of the SQL query
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,9 +57,10 @@ public class DbHandler {
         }
     }
 
-    public void getFromDb(String query) {
-        // ResultSet is initially before the first data set
 
+    public List<DbEntry> getAllFromDb(String query) {
+        // ResultSet is initially before the first data set
+        List<DbEntry> result = new ArrayList<>();
 
         try {
             resultSet = statement
@@ -77,18 +79,18 @@ public class DbHandler {
 //                Timestamp timestamp = resultSet.getTimestamp("Timestamp");
 //                DbEntry entry = new DbEntry(date, desc, amount, balance, timestamp);
                 DbEntry entry = new DbEntry(date, desc, debit,credit, balance);
-                dBentries.add(entry);
+                result.add(entry);
 
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        return result;
     }
 
     public void setEntries(List<Entry> entries) {
         if (dBentries.size() == 0)
-            getFromDb(selectAll);
+            dBentries= getAllFromDb(selectAll);
         String query = "insert into " + db + "." + table + " values (?, ?, ?, ?,? )";
 //        String query = "insert into "+db+"."+table+" values (?, ?, ?, ? ,?,?)";
 
@@ -97,7 +99,7 @@ public class DbHandler {
         int count = 0;
         boolean start = false;
         for (DbEntry dBentry : dBentries) {
-            if (dBentry.date.equals(firstEntry.date) && dBentry.debit.equals(firstEntry.debit) && dBentry.credit.equals(firstEntry.credit)) {
+            if (dBentry.getEntryAsString().equals(firstEntry.date) && dBentry.debit.equals(firstEntry.debit) && dBentry.credit.equals(firstEntry.credit)) {
                 start = true;
             }
             if (start)
@@ -112,7 +114,7 @@ public class DbHandler {
             // "myuser, webpage, datum, summary, COMMENTS from feedback.comments");
             // Parameters start with 1
 
-            Double old = getBalance();
+            Double old = getLast().balance;
             Double balance;
 
             for(int i=count;i<entries.size();i++){
@@ -141,8 +143,10 @@ public class DbHandler {
 
     }
 
-    public Double getBalance() {
-        return dBentries.get(dBentries.size() - 1).balance;
+    public DbEntry getLast() {
+//        if(dBentries.isEmpty())
+//            getAllFromDb()
+        return dBentries.get(dBentries.size() - 1);
     }
 
 //    public int getMultiplier(){
